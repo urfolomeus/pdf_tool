@@ -1,6 +1,7 @@
 import os
 from uuid import uuid4
 
+import pytesseract
 from pdf2image import convert_from_path
 from PIL import Image
 
@@ -37,3 +38,13 @@ def crop(x, y, width, height, canvas_width, canvas_height):
 
     cropped_image.save(crop_path)
     print(f"Cropped image saved to {crop_path}")
+    return crop_path
+
+
+def crop_to_text(crop_path):
+    crop = Image.open(crop_path)
+    text = pytesseract.image_to_string(crop)
+
+    print(f"Extracted text: {text}")
+
+    return text
