@@ -3,6 +3,7 @@ from operator import itemgetter
 from flask import jsonify, render_template, request, send_from_directory
 
 from . import pdf_blueprint
+from .utils.pdf_processor import crop
 
 
 @pdf_blueprint.route("/")
@@ -18,9 +19,18 @@ def serve_pdf(filename):
 @pdf_blueprint.route("/pdf/selection", methods=["POST"])
 def process_selection():
     data = request.json
-    id, x, y, width, height = itemgetter("id", "x", "y", "width", "height")(data)
+    id, x, y, width, height, canvas_width, canvas_height = itemgetter(
+        "id", "x", "y", "width", "height", "canvasWidth", "canvasHeight"
+    )(data)
 
     print(f"ID: {id}, X: {x}, Y: {y}, Width: {width}, Height: {height}")
+
+    # Crop the image
+    try:
+        crop(x, y, width, height, canvas_width, canvas_height)
+    except Exception as e:
+        print(f"Error processing PDF: {str(e)}")
+        return jsonify({"error": f"Error processing PDF: {str(e)}"}), 400
 
     # hardwiring for now
     value = "255"
