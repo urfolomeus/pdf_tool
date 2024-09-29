@@ -4,11 +4,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="static/js/pdfjs/build/pdf.mjs" type="module"></script>
+
   <title>PDF Tool</title>
 </head>
 
 <body>
   <h1>PDF Tool</h1>
+
+  <div id="pdf-viewer"></div>
+
+  <script type="module">
+    const pdfScale = 1;
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'static/js/pdfjs/build/pdf.worker.mjs';
+
+    pdfjsLib.getDocument(`/pdf/sample.pdf`).promise.then(pdf => {
+      // At the moment, we only render the first page
+      const pageNum = 1;
+      renderPage(pdf, pageNum);
+    });
+
+    const createCanvas = (viewport) => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      return canvas;
+    };
+
+    const renderPage = (pdf, pageNum) => {
+      pdf.getPage(pageNum).then(page => {
+        const viewport = page.getViewport({ scale: pdfScale });
+        const canvas = createCanvas(viewport);
+
+        const renderContext = {
+          canvasContext: canvas.getContext('2d'),
+          viewport: viewport
+        };
+
+        page.render(renderContext);
+
+        document.getElementById('pdf-viewer').innerHTML = '';
+        document.getElementById('pdf-viewer').appendChild(canvas);
+      });
+    }
+  </script>
 </body>
 
 </html>
