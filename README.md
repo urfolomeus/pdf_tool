@@ -17,7 +17,7 @@ pip install -r requirements.txt
 ## Run
 
 ```shell
-flask --app app run
+python -m app
 ```
 
 This will run the server on http://localhost:5000.
