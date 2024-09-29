@@ -32,6 +32,10 @@
 
   <div id="sidebar">
     <button id="clear-selections">Clear Selections</button>
+    <div id="results">
+      <h2>Results</h2>
+      <ul></ul>
+    </div>
   </div>
 
   <div id="pdf-viewer">
@@ -74,8 +78,8 @@
 
     const updateSelection = (e) => {
       if (!isSelecting) return;
-      const currentSelection = getCurrentSelection(e.offsetX, e.offsetY);
-      redrawSelectionCanvas(currentSelection);
+      const currentRect = getRect(e.offsetX, e.offsetY);
+      redrawSelectionCanvas(currentRect);
     };
 
     const endSelection = (e) => {
@@ -83,13 +87,13 @@
 
       isSelecting = false;
 
-      const currentSelection = getCurrentSelection(e.offsetX, e.offsetY);
-      selections.push(currentSelection);
+      const currentRect = getRect(e.offsetX, e.offsetY);
+      selections.push(currentRect);
 
       redrawSelectionCanvas();
     };
 
-    const getCurrentSelection = (endX, endY) => {
+    const getRect = (endX, endY) => {
       return {
         x: startX,
         y: startY,
@@ -98,7 +102,7 @@
       };
     };
 
-    const redrawSelectionCanvas = (currentSelection = null) => {
+    const redrawSelectionCanvas = (currentRect = null) => {
       selectionCtx.clearRect(0, 0, selectionLayer.width, selectionLayer.height);
 
       selectionCtx.strokeStyle = 'red';
@@ -108,8 +112,8 @@
         selectionCtx.strokeRect(selection.x, selection.y, selection.width, selection.height);
       });
 
-      if (currentSelection) {
-        selectionCtx.strokeRect(currentSelection.x, currentSelection.y, currentSelection.width, currentSelection.height);
+      if (currentRect) {
+        selectionCtx.strokeRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
       }
     };
 
