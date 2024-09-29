@@ -143,6 +143,15 @@
       });
     };
 
+    const rebuildInputList = () => {
+      const results = document.querySelector('#results ul');
+      results.innerHTML = '';
+
+      selections.forEach(selection => {
+        addInputToList(selection.id, selection.value);
+      });
+    };
+
     const updateSelectionValue = (id, value) => {
       const selection = selections.find(selection => selection.id === id);
       selection.value = value;
@@ -166,6 +175,7 @@
 
     const clearSelections = () => {
       selections = [];
+      rebuildInputList();
       redrawSelectionCanvas();
     };
 
