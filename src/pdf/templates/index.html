@@ -88,7 +88,9 @@
       isSelecting = false;
 
       const currentRect = getRect(e.offsetX, e.offsetY);
-      selections.push(currentRect);
+      const currentSelection = { id: crypto.randomUUID(), ...currentRect };
+      selections.push(currentSelection);
+      processSelection(currentSelection);
 
       redrawSelectionCanvas();
     };
@@ -100,6 +102,49 @@
         width: endX - startX,
         height: endY - startY
       };
+    };
+
+    const processSelection = (selection) => {
+      fetch('/pdf/selection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(selection)
+      })
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to process selection');
+          return response.json()
+        })
+        .then(showResult)
+        .catch(error => console.error({ error }));
+    };
+
+    const showResult = ({ result: { id, value } }) => {
+      addInputToList(id, value);
+      updateSelectionValue(id, value);
+    };
+
+    const addInputToList = (id, value) => {
+      const resultInput = document.createElement('input', { type: 'text' });
+      resultInput.id = id;
+      resultInput.value = value;
+
+      const result = document.createElement('li');
+      result.appendChild(resultInput);
+
+      const results = document.querySelector('#results ul');
+      results.appendChild(result);
+
+      resultInput.addEventListener('input', (e) => {
+        updateSelectionValue(e.target.id, e.target.value)
+      });
+    };
+
+    const updateSelectionValue = (id, value) => {
+      const selection = selections.find(selection => selection.id === id);
+      selection.value = value;
+      console.log({ selections });
     };
 
     const redrawSelectionCanvas = (currentRect = null) => {
