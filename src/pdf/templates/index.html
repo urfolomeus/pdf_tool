@@ -5,53 +5,122 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>PDF Tool</title>
+
   <script src="static/js/pdfjs/build/pdf.mjs" type="module"></script>
 
-  <title>PDF Tool</title>
+  <style>
+    #pdf-viewer {
+      position: relative;
+      width: 100%;
+      height: 800px;
+    }
+
+    #pdf-viewer canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
 </head>
 
 <body>
   <h1>PDF Tool</h1>
 
-  <div id="pdf-viewer"></div>
+  <div id="sidebar">
+    <button id="clear-selections">Clear Selections</button>
+  </div>
+
+  <div id="pdf-viewer">
+    <canvas id="pdf-layer"></canvas>
+    <canvas id="selection-layer"></canvas>
+  </div>
 
   <script type="module">
+    const pageNum = 1; // At the moment, we only render the first page
     const pdfScale = 1;
+
+    const pdfLayer = document.getElementById('pdf-layer');
+    const selectionLayer = document.getElementById('selection-layer');
+    const selectionCtx = selectionLayer.getContext('2d');
+
+    let isSelecting = false;
+    let selections = [];
+    let startX, startY;
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'static/js/pdfjs/build/pdf.worker.mjs';
 
     pdfjsLib.getDocument(`/pdf/sample.pdf`).promise.then(pdf => {
-      // At the moment, we only render the first page
-      const pageNum = 1;
-      renderPage(pdf, pageNum);
-    });
-
-    const createCanvas = (viewport) => {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      return canvas;
-    };
-
-    const renderPage = (pdf, pageNum) => {
       pdf.getPage(pageNum).then(page => {
         const viewport = page.getViewport({ scale: pdfScale });
-        const canvas = createCanvas(viewport);
 
-        const renderContext = {
-          canvasContext: canvas.getContext('2d'),
+        pdfLayer.width = selectionLayer.width = viewport.width;
+        pdfLayer.height = selectionLayer.height = viewport.height;
+
+        page.render({
+          canvasContext: pdfLayer.getContext('2d'),
           viewport: viewport
-        };
-
-        page.render(renderContext);
-
-        document.getElementById('pdf-viewer').innerHTML = '';
-        document.getElementById('pdf-viewer').appendChild(canvas);
+        });
       });
-    }
+    });
+
+    const startSelection = (e) => {
+      isSelecting = true;
+      [startX, startY] = [e.offsetX, e.offsetY];
+    };
+
+    const updateSelection = (e) => {
+      if (!isSelecting) return;
+
+      redrawSelectionCanvas({
+        x: startX,
+        y: startY,
+        width: e.offsetX - startX,
+        height: e.offsetY - startY
+      });
+    };
+
+    const endSelection = (e) => {
+      if (!isSelecting) return;
+
+      isSelecting = false;
+
+      selections.push({
+        x: startX,
+        y: startY,
+        width: e.offsetX - startX,
+        height: e.offsetY - startY
+      });
+
+      redrawSelectionCanvas();
+    };
+
+    const redrawSelectionCanvas = (currentSelection = null) => {
+      selectionCtx.clearRect(0, 0, selectionLayer.width, selectionLayer.height);
+
+      selectionCtx.strokeStyle = 'red';
+      selectionCtx.lineWidth = 2;
+
+      selections.forEach(selection => {
+        selectionCtx.strokeRect(selection.x, selection.y, selection.width, selection.height);
+      });
+
+      if (currentSelection) {
+        selectionCtx.strokeRect(currentSelection.x, currentSelection.y, currentSelection.width, currentSelection.height);
+      }
+    };
+
+    const clearSelections = () => {
+      selections = [];
+      redrawSelectionCanvas();
+    };
+
+    selectionLayer.addEventListener('mousedown', startSelection);
+    selectionLayer.addEventListener('mousemove', updateSelection);
+    selectionLayer.addEventListener('mouseup', endSelection);
+    selectionLayer.addEventListener('mouseout', endSelection);
+
+    document.getElementById('clear-selections').addEventListener('click', clearSelections);
   </script>
 </body>
 
