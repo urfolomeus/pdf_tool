@@ -1,0 +1,14 @@
+#pdf-viewer {
+  position: relative;
+  width: 100%;
+}
+
+#pdf-viewer canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#pdf-layer {
+  border: 2px solid #333;
+}
