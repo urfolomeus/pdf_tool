@@ -35,3 +35,17 @@ SAVE_CROPS=true python -m app
 ```
 
 or set the env var in any other way you prefer.
+
+### Choosing a text extraction strategy
+
+We can switch our method of extracting text from crops by setting an `EXTRACTOR` env var like so:
+
+```shell
+EXTRACTOR=tesseract python -m app
+```
+
+To add a new strategy:
+
+1. Add the code that implements it into a file in [src/pdf/utils/strategies](src/pdf/utils/strategies).
+2. Import that file into [src/pdf/utils/pdf_processor.py](src/pdf/utils/pdf_processor.py).
+3. Add a match case into the `extract_text` method in [pdf_processor.py](src/pdf/utils/pdf_processor.py) to handle it.
