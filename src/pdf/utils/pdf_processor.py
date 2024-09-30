@@ -5,8 +5,10 @@ import pytesseract
 from pdf2image import convert_from_path
 from PIL import Image
 
+CROPS_FOLDER = "src/pdf/crops"
 
-def crop(x, y, width, height, canvas_width, canvas_height, save_crops=False):
+
+def crop(x, y, width, height, canvas_width, canvas_height):
     filepath = os.path.join("src/pdf/files", "sample.pdf")
 
     images = convert_from_path(filepath)
@@ -27,9 +29,12 @@ def crop(x, y, width, height, canvas_width, canvas_height, save_crops=False):
     except Image.DecompressionBombError:
         raise Exception("Image is too large")
 
-    if save_crops:
+    if os.getenv("SAVE_CROPS") == "true":
+        # Ensure the CROPS_FOLDER exists
+        os.makedirs(CROPS_FOLDER, exist_ok=True)
+
         crop_filename = f"crop_{uuid.uuid4().hex}.png"
-        crop_path = os.path.join("src/pdf/crops", crop_filename)
+        crop_path = os.path.join(CROPS_FOLDER, crop_filename)
 
         cropped_image.save(crop_path)
         print(f"Cropped image saved to {crop_path}")

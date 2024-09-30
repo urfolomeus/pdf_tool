@@ -25,3 +25,13 @@ python -m app
 ```
 
 This will run the server on http://localhost:5001.
+
+### Saving crop files
+
+We can optionally save the files that PIL is cropping if we're trying to debug the output of the OCR process. To do so, set an env var like so:
+
+```shell
+SAVE_CROPS=true python -m app
+```
+
+or set the env var in any other way you prefer.
