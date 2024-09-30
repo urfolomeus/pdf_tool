@@ -6,6 +6,7 @@ from pdf2image import convert_from_path
 from PIL import Image
 
 CROPS_FOLDER = "src/pdf/crops"
+DEFAULT_EXTRACTOR = "tesseract"
 
 
 def crop(x, y, width, height, canvas_width, canvas_height):
@@ -43,6 +44,16 @@ def crop(x, y, width, height, canvas_width, canvas_height):
 
 
 def extract_text(cropped_image):
+    extractor = os.getenv("EXTRACTOR", DEFAULT_EXTRACTOR)
+
+    match extractor:
+        case "tesseract":
+            return extract_text_tesseract(cropped_image)
+        case _:
+            raise Exception(f"Extractor {extractor} not supported")
+
+
+def extract_text_tesseract(cropped_image):
     text = pytesseract.image_to_string(cropped_image)
     print(f"Extracted text: {text}")
     return text
