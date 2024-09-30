@@ -110,6 +110,19 @@ const updateSelectionValue = (id, value) => {
   const selection = selections.find(selection => selection.id === id);
   selection.value = value;
   console.log({ selections });
+  updateTotal();
+};
+
+const updateTotal = () => {
+  const total = selections.reduce((acc, selection) => {
+    let value = parseInt(selection.value);
+
+    if (isNaN(value)) value = 0;
+
+    return acc + value;
+  }, 0);
+
+  document.getElementById('total').innerHTML = total;
 };
 
 const redrawSelectionCanvas = (currentRect = null) => {
@@ -131,6 +144,7 @@ const clearSelections = () => {
   selections = [];
   rebuildInputList();
   redrawSelectionCanvas();
+  updateTotal();
 };
 
 selectionLayer.addEventListener('mousedown', startSelection);
