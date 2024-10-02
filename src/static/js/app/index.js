@@ -12,6 +12,8 @@ const ZOOM_STEP = 0.2;
 /* GLOBAL VARIABLES ----------------------------------------- */
 
 let pdfPage;
+let pdfViewport;
+let initialPdfWidth, intialPdfHeight;
 let scale = PDF_INITIAL_SCALE;
 
 let isPanMode = false;
@@ -43,14 +45,15 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'static/js/pdfjs/build/pdf.worker.mjs';
 pdfjsLib.getDocument(PDF_PATH).promise.then(pdf => {
   pdf.getPage(PDF_PAGE_NUM).then(page => {
     pdfPage = page;
+    pdfViewport = pdfPage.getViewport({ scale });
+    initialPdfWidth = pdfViewport.width;
+    intialPdfHeight = pdfViewport.height;
     renderPage();
   });
 });
 
 // Render the PDF and selection layers
 const renderPage = () => {
-  const pdfViewport = pdfPage.getViewport({ scale });
-
   pdfCanvas.width = selectionCanvas.width = pdfViewport.width;
   pdfCanvas.height = selectionCanvas.height = pdfViewport.height;
 
@@ -141,12 +144,14 @@ const stopSelecting = (e) => {
 
   if (selection.width > 0 && selection.height > 0) {
     selections.push(selection);
+    processSelection(selection);
     drawRect();
   }
 }
 
 const buildSelection = (endX, endY) => {
   return {
+    id: crypto.randomUUID(),
     x: selectStartX,
     y: selectStartY,
     width: endX - selectStartX,
@@ -190,6 +195,36 @@ const drawRect = (currentRect) => {
     );
   }
 }
+
+const processSelection = (selection) => {
+  // We need to send the PDF dimensions to the server so that we can scale the
+  // selection to the actual PDF for OCR processing
+  const selectionWithPdfDimensions = { ...selection, canvasWidth: initialPdfWidth, canvasHeight: intialPdfHeight };
+
+  fetch('/pdf/selection', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(selectionWithPdfDimensions)
+  })
+    .then(response => {
+      if (!response.ok) throw new Error('Failed to process selection');
+      return response.json()
+    })
+    .then(processResult)
+    .catch(error => console.error({ error }));
+};
+
+const processResult = ({ result: { id, value } }) => {
+  updateSelectionValue(id, value);
+};
+
+const updateSelectionValue = (id, value) => {
+  const selection = selections.find(selection => selection.id === id);
+  selection.value = value;
+  console.log(selection);
+};
 
 const clearSelections = () => {
   selections = [];
