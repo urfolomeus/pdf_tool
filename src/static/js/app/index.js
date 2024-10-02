@@ -12,6 +12,9 @@ const ZOOM_STEP = 0.2;
 let pdfPage;
 let scale = PDF_INITIAL_SCALE;
 
+let isPanMode = false;
+let isPanning = false;
+let panStartX, panStartY, panX, panY;
 
 /* DOM ELEMENTS --------------------------------------------- */
 
@@ -43,14 +46,16 @@ const renderPage = () => {
     canvasContext: pdfCanvas.getContext('2d'),
     viewport: pdfViewport
   });
+
+  updateTransform();
+}
+
+const updateTransform = () => {
+  canvasWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
 }
 
 
 /* ZOOMING -------------------------------------------------- */
-
-const updateTransform = () => {
-  canvasWrapper.style.transform = `scale(${scale})`;
-}
 
 document.getElementById('zoomIn').addEventListener('click', () => {
   scale += ZOOM_STEP;
@@ -61,3 +66,60 @@ document.getElementById('zoomOut').addEventListener('click', () => {
   scale -= ZOOM_STEP;
   renderPage();
 });
+
+
+/* PANNING -------------------------------------------------- */
+
+// initialize pan variables
+panStartX = panStartY = 0;
+panX = panY = 0;
+
+const startPan = (e) => {
+  isPanning = true;
+  panStartX = e.clientX - panX;
+  panStartY = e.clientY - panY;
+}
+
+const pan = (e) => {
+  if (!isPanning) return;
+
+  panX = e.clientX - panStartX;
+  panY = e.clientY - panStartY;
+  updateTransform();
+}
+
+const stopPan = (e) => {
+  isPanning = false;
+}
+
+
+/* EVENT HANDLERS ------------------------------------------- */
+
+const handleMouseDown = (e) => {
+  if (isPanMode) {
+    startPan(e);
+  }
+}
+
+const handleMouseMove = (e) => {
+  if (isPanMode) {
+    pan(e);
+  }
+}
+
+const handleMouseUp = (e) => {
+  if (isPanMode) {
+    stopPan(e);
+  }
+}
+
+
+/* EVENT LISTENERS ------------------------------------------ */
+
+canvasWrapper.addEventListener('mousedown', handleMouseDown);
+canvasWrapper.addEventListener('mousemove', handleMouseMove);
+canvasWrapper.addEventListener('mouseup', handleMouseUp);
+canvasWrapper.addEventListener('mouseleave', handleMouseUp);
+
+document.addEventListener("keydown", (e) => isPanMode = e.shiftKey);
+document.addEventListener("keyup", (e) => isPanMode = false);
