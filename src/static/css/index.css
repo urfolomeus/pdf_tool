@@ -1,14 +1,53 @@
-#pdf-viewer {
-  position: relative;
-  width: 100%;
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
-#pdf-viewer canvas {
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #f0f0f0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.canvas-container {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.canvas-wrapper canvas {
   position: absolute;
   top: 0;
   left: 0;
 }
 
-#pdf-layer {
-  border: 2px solid #333;
+#drawingCanvas {
+  z-index: 1;
+}
+
+.mode-toggle {
+  margin-top: 20px;
+}
+
+button {
+  margin: 10px 2px;
+  background-color: black;
+  color: white;
+  padding: 5px 10px;
 }

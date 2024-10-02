@@ -13,20 +13,25 @@
 </head>
 
 <body>
-  <h1>PDF Tool</h1>
-
-  <div id="sidebar">
-    <button id="clear-selections">Clear Selections</button>
-    <div id="results">
-      <h2>Results</h2>
-      <p>Total: <span id="total">0</span></p>
-      <ul></ul>
+  <div class="container">
+    <div class="sidebar">
+      <h1>PDF Tool</h1>
+      <button id="zoomIn">Zoom In</button>
+      <button id="zoomOut">Zoom Out</button>
+      <button id="clear-selections">Clear Selections</button>
+      <div id="results">
+        <h2>Results</h2>
+        <p>Total: <span id="total">0</span></p>
+        <ul></ul>
+      </div>
     </div>
-  </div>
 
-  <div id="pdf-viewer">
-    <canvas id="pdf-layer"></canvas>
-    <canvas id="selection-layer"></canvas>
+    <div class="canvas-container">
+      <div class="canvas-wrapper">
+        <canvas id="pdf-layer"></canvas>
+        <canvas id="selection-layer"></canvas>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="static/js/app/index.js"></script>
