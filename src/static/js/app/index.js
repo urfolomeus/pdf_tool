@@ -214,6 +214,7 @@ const processResult = ({ result: { id, value } }) => {
 const updateSelectionValue = (id, value) => {
   const selection = selections.find(selection => selection.id === id);
   selection.value = value;
+  updateTotal();
 };
 
 const rebuildInputList = () => {
