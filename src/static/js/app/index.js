@@ -18,6 +18,7 @@ let panStartX, panStartY, panX, panY;
 
 let isSelecting = false;
 let selectStartX, selectStartY;
+let selections = [];
 
 
 /* DOM ELEMENTS --------------------------------------------- */
@@ -52,6 +53,7 @@ const renderPage = () => {
   });
 
   updateTransform();
+  drawRect();
 }
 
 const updateTransform = () => {
@@ -119,9 +121,31 @@ const stopSelecting = (e) => {
   if (!isSelecting) return;
 
   isSelecting = false;
+
+  const { x, y } = getCanvasCoordinates(e);
+  saveSelection(x, y);
+  drawRect();
+}
+
+function saveSelection(endX, endY) {
+  const width = endX - selectStartX;
+  const height = endY - selectStartY;
+
+  if (width === 0 || height === 0) return;
+
+  const selection = {
+    x: selectStartX,
+    y: selectStartY,
+    width,
+    height
+  };
+
+  selections.push(selection);
 }
 
 const scaleNormalize = (value) => Math.round(value / scale);
+
+const rescale = (value) => value * scale;
 
 const getCanvasCoordinates = (event) => {
   const x = scaleNormalize(event.offsetX);
@@ -137,8 +161,22 @@ const drawRect = (currentRect) => {
   selectionContext.strokeStyle = 'red';
   selectionContext.lineWidth = 2 / scale;  // Adjust line width based on zoom
 
+  selections.forEach((selection) => {
+    selectionContext.strokeRect(
+      rescale(selection.x),
+      rescale(selection.y),
+      rescale(selection.width),
+      rescale(selection.height)
+    );
+  });
+
   if (currentRect) {
-    selectionContext.strokeRect(currentRect.x * scale, currentRect.y * scale, currentRect.width * scale, currentRect.height * scale);
+    selectionContext.strokeRect(
+      rescale(currentRect.x),
+      rescale(currentRect.y),
+      rescale(currentRect.width),
+      rescale(currentRect.height)
+    );
   }
 }
 
