@@ -4,6 +4,8 @@ const PDF_INITIAL_SCALE = 1;
 const PDF_PAGE_NUM = 1;
 const PDF_PATH = '/pdf/sample.pdf';
 
+const ZOOM_MIN = 0.4;
+const ZOOM_MAX = 3;
 const ZOOM_STEP = 0.2;
 
 
@@ -28,6 +30,7 @@ const pdfCanvas = document.getElementById('pdf-layer');
 const selectionCanvas = document.getElementById('selection-layer');
 
 const clearSelectionsButton = document.getElementById('clear-selections');
+const resetZoomButton = document.getElementById('resetZoom');
 const zoomInButton = document.getElementById('zoomIn');
 const zoomOutButton = document.getElementById('zoomOut');
 
@@ -69,11 +72,18 @@ const updateTransform = () => {
 
 const zoomIn = () => {
   scale += ZOOM_STEP;
+  scale = Math.min(scale, ZOOM_MAX);
   renderPage();
 };
 
 const zoomOut = () => {
   scale -= ZOOM_STEP;
+  scale = Math.max(scale, ZOOM_MIN);
+  renderPage();
+};
+
+const resetZoom = () => {
+  scale = PDF_INITIAL_SCALE;
   renderPage();
 };
 
@@ -225,6 +235,7 @@ canvasWrapper.addEventListener('mouseup', handleMouseUp);
 canvasWrapper.addEventListener('mouseleave', handleMouseUp);
 
 clearSelectionsButton.addEventListener('click', clearSelections);
+resetZoomButton.addEventListener('click', resetZoom);
 zoomInButton.addEventListener('click', zoomIn);
 zoomOutButton.addEventListener('click', zoomOut);
 
