@@ -28,6 +28,8 @@ const pdfCanvas = document.getElementById('pdf-layer');
 const selectionCanvas = document.getElementById('selection-layer');
 
 const clearSelectionsButton = document.getElementById('clear-selections');
+const zoomInButton = document.getElementById('zoomIn');
+const zoomOutButton = document.getElementById('zoomOut');
 
 
 /* PDF SETUP ------------------------------------------------ */
@@ -65,15 +67,15 @@ const updateTransform = () => {
 
 /* ZOOMING -------------------------------------------------- */
 
-document.getElementById('zoomIn').addEventListener('click', () => {
+const zoomIn = () => {
   scale += ZOOM_STEP;
   renderPage();
-});
+};
 
-document.getElementById('zoomOut').addEventListener('click', () => {
+const zoomOut = () => {
   scale -= ZOOM_STEP;
   renderPage();
-});
+};
 
 
 /* PANNING -------------------------------------------------- */
@@ -223,6 +225,8 @@ canvasWrapper.addEventListener('mouseup', handleMouseUp);
 canvasWrapper.addEventListener('mouseleave', handleMouseUp);
 
 clearSelectionsButton.addEventListener('click', clearSelections);
+zoomInButton.addEventListener('click', zoomIn);
+zoomOutButton.addEventListener('click', zoomOut);
 
 document.addEventListener("keydown", (e) => isPanMode = e.shiftKey);
 document.addEventListener("keyup", (e) => isPanMode = false);
