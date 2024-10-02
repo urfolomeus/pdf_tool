@@ -36,6 +36,7 @@ const resetZoomButton = document.getElementById('resetZoom');
 const zoomInButton = document.getElementById('zoomIn');
 const zoomOutButton = document.getElementById('zoomOut');
 
+const totalDisplay = document.getElementById('total');
 const resultsList = document.querySelector('#results ul');
 
 
@@ -221,6 +222,7 @@ const processSelection = (selection) => {
 const processResult = ({ result: { id, value } }) => {
   updateSelectionValue(id, value);
   rebuildInputList();
+  updateTotal();
 };
 
 const updateSelectionValue = (id, value) => {
@@ -252,10 +254,23 @@ const addInputToList = (id, value) => {
   });
 };
 
+const updateTotal = () => {
+  const total = selections.reduce((acc, selection) => {
+    let value = parseInt(selection.value);
+
+    if (isNaN(value)) value = 0;
+
+    return acc + value;
+  }, 0);
+
+  totalDisplay.innerHTML = total;
+};
+
 const clearSelections = () => {
   selections = [];
   drawRect();
   rebuildInputList();
+  updateTotal();
 }
 
 
