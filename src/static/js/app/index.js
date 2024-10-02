@@ -16,6 +16,10 @@ let isPanMode = false;
 let isPanning = false;
 let panStartX, panStartY, panX, panY;
 
+let isSelecting = false;
+let selectStartX, selectStartY;
+
+
 /* DOM ELEMENTS --------------------------------------------- */
 
 const canvasWrapper = document.querySelector('.canvas-wrapper');
@@ -93,23 +97,75 @@ const stopPan = (e) => {
 }
 
 
+/* SELECTING -------------------------------------------------- */
+
+const startSelecting = (e) => {
+  isSelecting = true;
+  const { x, y } = getCanvasCoordinates(e);
+  selectStartX = x;
+  selectStartY = y;
+}
+
+const selecting = (e) => {
+  if (!isSelecting) return;
+
+  const { x, y } = getCanvasCoordinates(e);
+  const currentRect = { x: selectStartX, y: selectStartY, width: x - selectStartX, height: y - selectStartY };
+
+  drawRect(currentRect);
+}
+
+const stopSelecting = (e) => {
+  if (!isSelecting) return;
+
+  isSelecting = false;
+}
+
+const scaleNormalize = (value) => Math.round(value / scale);
+
+const getCanvasCoordinates = (event) => {
+  const x = scaleNormalize(event.offsetX);
+  const y = scaleNormalize(event.offsetY);
+  return { x, y };
+}
+
+const drawRect = (currentRect) => {
+  const selectionContext = selectionCanvas.getContext('2d');
+
+  selectionContext.clearRect(0, 0, selectionCanvas.width, selectionCanvas.height);
+
+  selectionContext.strokeStyle = 'red';
+  selectionContext.lineWidth = 2 / scale;  // Adjust line width based on zoom
+
+  if (currentRect) {
+    selectionContext.strokeRect(currentRect.x * scale, currentRect.y * scale, currentRect.width * scale, currentRect.height * scale);
+  }
+}
+
+
 /* EVENT HANDLERS ------------------------------------------- */
 
 const handleMouseDown = (e) => {
   if (isPanMode) {
     startPan(e);
+  } else {
+    startSelecting(e);
   }
 }
 
 const handleMouseMove = (e) => {
   if (isPanMode) {
     pan(e);
+  } else {
+    selecting(e);
   }
 }
 
 const handleMouseUp = (e) => {
   if (isPanMode) {
     stopPan(e);
+  } else {
+    stopSelecting(e);
   }
 }
 
