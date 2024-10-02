@@ -36,6 +36,8 @@ const resetZoomButton = document.getElementById('resetZoom');
 const zoomInButton = document.getElementById('zoomIn');
 const zoomOutButton = document.getElementById('zoomOut');
 
+const resultsList = document.querySelector('#results ul');
+
 
 /* PDF SETUP ------------------------------------------------ */
 
@@ -218,6 +220,7 @@ const processSelection = (selection) => {
 
 const processResult = ({ result: { id, value } }) => {
   updateSelectionValue(id, value);
+  rebuildInputList();
 };
 
 const updateSelectionValue = (id, value) => {
@@ -226,9 +229,33 @@ const updateSelectionValue = (id, value) => {
   console.log(selection);
 };
 
+const rebuildInputList = () => {
+  resultsList.innerHTML = '';
+
+  selections.forEach(selection => {
+    addInputToList(selection.id, selection.value);
+  });
+};
+
+const addInputToList = (id, value) => {
+  const resultInput = document.createElement('input', { type: 'text' });
+  resultInput.id = id;
+  resultInput.value = value;
+
+  const result = document.createElement('li');
+  result.appendChild(resultInput);
+
+  resultsList.appendChild(result);
+
+  resultInput.addEventListener('input', (e) => {
+    updateSelectionValue(e.target.id, e.target.value)
+  });
+};
+
 const clearSelections = () => {
   selections = [];
   drawRect();
+  rebuildInputList();
 }
 
 
