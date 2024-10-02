@@ -244,8 +244,14 @@ const addInputToList = (id, value) => {
   resultInput.id = id;
   resultInput.value = value;
 
+  const deleteButton = document.createElement('button');
+  deleteButton.innerHTML = '-';
+  deleteButton.dataset.id = id;
+  deleteButton.addEventListener('click', (e) => removeSelection(e.target.dataset.id));
+
   const result = document.createElement('li');
   result.appendChild(resultInput);
+  result.appendChild(deleteButton);
 
   resultsList.appendChild(result);
 
@@ -265,6 +271,13 @@ const updateTotal = () => {
 
   totalDisplay.innerHTML = total;
 };
+
+const removeSelection = (id) => {
+  selections = selections.filter(selection => selection.id !== id);
+  rebuildInputList();
+  updateTotal();
+  drawRect();
+}
 
 const clearSelections = () => {
   selections = [];
