@@ -162,13 +162,9 @@ const buildSelection = (endX, endY) => {
   };
 }
 
-const scaleNormalize = (value) => Math.round(value / scale);
-
-const rescale = (value) => value * scale;
-
 const getCanvasCoordinates = (event) => {
-  const x = scaleNormalize(event.offsetX);
-  const y = scaleNormalize(event.offsetY);
+  const x = event.offsetX;
+  const y = event.offsetY;
   return { x, y };
 }
 
@@ -181,21 +177,11 @@ const drawRect = (currentRect) => {
   selectionContext.lineWidth = 2 / scale;  // Adjust line width based on zoom
 
   selections.forEach((selection) => {
-    selectionContext.strokeRect(
-      rescale(selection.x),
-      rescale(selection.y),
-      rescale(selection.width),
-      rescale(selection.height)
-    );
+    selectionContext.strokeRect(selection.x, selection.y, selection.width, selection.height);
   });
 
   if (currentRect) {
-    selectionContext.strokeRect(
-      rescale(currentRect.x),
-      rescale(currentRect.y),
-      rescale(currentRect.width),
-      rescale(currentRect.height)
-    );
+    selectionContext.strokeRect(currentRect.x, currentRect.y, currentRect.width, currentRect.height);
   }
 }
 
