@@ -137,24 +137,21 @@ const stopSelecting = (e) => {
   isSelecting = false;
 
   const { x, y } = getCanvasCoordinates(e);
-  saveSelection(x, y);
-  drawRect();
+  const selection = buildSelection(x, y);
+
+  if (selection.width > 0 && selection.height > 0) {
+    selections.push(selection);
+    drawRect();
+  }
 }
 
-function saveSelection(endX, endY) {
-  const width = endX - selectStartX;
-  const height = endY - selectStartY;
-
-  if (width === 0 || height === 0) return;
-
-  const selection = {
+const buildSelection = (endX, endY) => {
+  return {
     x: selectStartX,
     y: selectStartY,
-    width,
-    height
+    width: endX - selectStartX,
+    height: endY - selectStartY
   };
-
-  selections.push(selection);
 }
 
 const scaleNormalize = (value) => Math.round(value / scale);
