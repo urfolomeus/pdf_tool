@@ -27,6 +27,8 @@ const canvasWrapper = document.querySelector('.canvas-wrapper');
 const pdfCanvas = document.getElementById('pdf-layer');
 const selectionCanvas = document.getElementById('selection-layer');
 
+const clearSelectionsButton = document.getElementById('clear-selections');
+
 
 /* PDF SETUP ------------------------------------------------ */
 
@@ -180,6 +182,11 @@ const drawRect = (currentRect) => {
   }
 }
 
+const clearSelections = () => {
+  selections = [];
+  drawRect();
+}
+
 
 /* EVENT HANDLERS ------------------------------------------- */
 
@@ -214,6 +221,8 @@ canvasWrapper.addEventListener('mousedown', handleMouseDown);
 canvasWrapper.addEventListener('mousemove', handleMouseMove);
 canvasWrapper.addEventListener('mouseup', handleMouseUp);
 canvasWrapper.addEventListener('mouseleave', handleMouseUp);
+
+clearSelectionsButton.addEventListener('click', clearSelections);
 
 document.addEventListener("keydown", (e) => isPanMode = e.shiftKey);
 document.addEventListener("keyup", (e) => isPanMode = false);
