@@ -4,7 +4,7 @@ import uuid
 from pdf2image import convert_from_path
 from PIL import Image
 
-from src.pdf.utils.strategies import tesseract
+from src.pdf.utils.strategies import paddle, tesseract
 
 CROPS_FOLDER = "src/pdf/crops"
 DEFAULT_EXTRACTOR = "tesseract"
@@ -50,5 +50,7 @@ def extract_text(cropped_image):
     match extractor:
         case "tesseract":
             return tesseract.extract_text(cropped_image)
+        case "paddle":
+            return paddle.extract_text(cropped_image)
         case _:
             raise Exception(f"Extractor {extractor} not supported")
