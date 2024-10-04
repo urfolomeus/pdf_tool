@@ -4,10 +4,7 @@ import uuid
 from pdf2image import convert_from_path
 from PIL import Image
 
-from src.pdf.utils.strategies import easyocr, paddle, tesseract
-
 CROPS_FOLDER = "src/pdf/crops"
-DEFAULT_EXTRACTOR = "tesseract"
 
 
 def crop(x, y, width, height, canvas_width, canvas_height):
@@ -42,19 +39,3 @@ def crop(x, y, width, height, canvas_width, canvas_height):
         print(f"Cropped image saved to {crop_path}")
 
     return cropped_image
-
-
-def extract_text(cropped_image):
-    extractor = os.getenv("EXTRACTOR", DEFAULT_EXTRACTOR)
-
-    print(f"Extracting text with {extractor}...")
-
-    match extractor:
-        case "tesseract":
-            return tesseract.extract_text(cropped_image)
-        case "paddle":
-            return paddle.extract_text(cropped_image)
-        case "easyocr":
-            return easyocr.extract_text(cropped_image)
-        case _:
-            raise Exception(f"Extractor {extractor} not supported")

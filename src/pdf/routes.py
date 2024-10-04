@@ -1,9 +1,9 @@
 from operator import itemgetter
 
-from flask import jsonify, render_template, request, send_from_directory
+from flask import current_app, jsonify, render_template, request, send_from_directory
 
 from . import pdf_blueprint
-from .utils.pdf_processor import crop, extract_text
+from .utils import pdf_processor
 
 
 @pdf_blueprint.route("/")
@@ -27,8 +27,11 @@ def process_selection():
 
     # Crop the image
     try:
-        cropped_image = crop(x, y, width, height, canvas_width, canvas_height)
-        value = extract_text(cropped_image)
+        cropped_image = pdf_processor.crop(
+            x, y, width, height, canvas_width, canvas_height
+        )
+        ocr_reader = current_app.config["OCR_READER"]
+        value = ocr_reader.extract_text(cropped_image)
     except Exception as e:
         print(f"Error processing PDF: {str(e)}")
         return jsonify({"error": f"Error processing PDF: {str(e)}"}), 400
