@@ -3,7 +3,7 @@ import os
 from flask import Flask
 
 from .pdf import pdf_blueprint
-from .pdf.utils.strategies import easyocr_reader
+from .pdf.utils.strategies import easyocr_reader, paddle
 
 
 def create_app():
@@ -15,6 +15,8 @@ def create_app():
     match extractor:
         case "easyocr":
             app.config["OCR_READER"] = easyocr_reader.EasyOCRReader()
+        case "paddle":
+            app.config["OCR_READER"] = paddle.PaddleOCRReader()
         case _:
             raise ValueError(f"Invalid extractor: {extractor}")
 
