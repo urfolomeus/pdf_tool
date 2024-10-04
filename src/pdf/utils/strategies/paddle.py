@@ -6,7 +6,7 @@ class PaddleOCRReader:
     def __init__(self):
         # Initialize PaddleOCR
         self.ocr = PaddleOCR(
-            use_angle_cls=False, lang="en", show_log=True, use_gpu=False
+            use_angle_cls=True, lang="en", show_log=False, use_gpu=False
         )
 
     def extract_text(self, cropped_image):
@@ -19,8 +19,14 @@ class PaddleOCRReader:
         result = self.ocr.ocr(image, cls=True)
 
         # Print the results
-        print(f"Got {len(result)} OCR results...")
-        for idx in range(len(result)):
-            res = result[idx]
-            for line in res:
-                print(line)
+        print(f"Got {len(result)} OCR results: {result}")
+        
+        texts = []
+        
+        if len(result) and result[0]:
+            for lines in result:
+                for line in lines:
+                    [_bounding_box, text_info] = line
+                    texts.append(text_info[0])
+
+        return texts[0]
