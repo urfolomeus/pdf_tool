@@ -47,6 +47,8 @@ def crop(x, y, width, height, canvas_width, canvas_height):
 def extract_text(cropped_image):
     extractor = os.getenv("EXTRACTOR", DEFAULT_EXTRACTOR)
 
+    print(f"Extracting text with {extractor}...")
+
     match extractor:
         case "tesseract":
             return tesseract.extract_text(cropped_image)
